@@ -75,9 +75,12 @@ func (p *ParserValidator) ParseRepoCfg(absRepoDir string, globalCfg valid.Global
 		// able to detect if it's a NotExist err.
 		return valid.RepoCfg{}, err
 	}
+	return p.ParseRepoCfgData(configData, globalCfg, repoID)
+}
 
+func (p *ParserValidator) ParseRepoCfgData(repoCfgData []byte, globalCfg valid.GlobalCfg, repoID string) (valid.RepoCfg, error) {
 	var rawConfig raw.RepoCfg
-	if err := yaml.UnmarshalStrict(configData, &rawConfig); err != nil {
+	if err := yaml.UnmarshalStrict(repoCfgData, &rawConfig); err != nil {
 		return valid.RepoCfg{}, err
 	}
 
@@ -101,7 +104,8 @@ func (p *ParserValidator) ParseRepoCfg(absRepoDir string, globalCfg valid.Global
 			return validConfig, err
 		}
 	}
-	err = globalCfg.ValidateRepoCfg(validConfig, repoID)
+
+	err := globalCfg.ValidateRepoCfg(validConfig, repoID)
 	return validConfig, err
 }
 

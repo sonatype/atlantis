@@ -129,7 +129,7 @@ func (b *Client) GetProjectKey(repoName string, cloneURL string) (string, error)
 
 // CreateComment creates a comment on the merge request. It will write multiple
 // comments if a single comment is too long.
-func (b *Client) CreateComment(repo models.Repo, pullNum int, comment string) error {
+func (b *Client) CreateComment(repo models.Repo, pullNum int, comment string, command string) error {
 	sepEnd := "\n```\n**Warning**: Output length greater than max comment size. Continued in next comment."
 	sepStart := "Continued from previous comment.\n```diff\n"
 	comments := common.SplitComment(comment, maxCommentLength, sepEnd, sepStart)
@@ -317,7 +317,19 @@ func (g *Client) GetTeamNamesForUser(repo models.Repo, user models.User) ([]stri
 	return nil, nil
 }
 
+<<<<<<< HEAD
 // GetUserType get the user Type to verify is this is a Org user or a regular user
 func (g *Client) GetUserType(repo models.Repo, user models.User) (string, error) {
 	return "", nil
+=======
+func (b *Client) SupportsSingleFileDownload(repo models.Repo) bool {
+	return false
+}
+
+// DownloadRepoConfigFile return `atlantis.yaml` content from VCS (which support fetch a single file from repository)
+// The first return value indicate that repo contain atlantis.yaml or not
+// if BaseRepo had one repo config file, its content will placed on the second return value
+func (b *Client) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
+	return false, []byte{}, fmt.Errorf("not implemented")
+>>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

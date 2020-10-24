@@ -85,7 +85,7 @@ func (b *Client) GetModifiedFiles(repo models.Repo, pull models.PullRequest) ([]
 }
 
 // CreateComment creates a comment on the merge request.
-func (b *Client) CreateComment(repo models.Repo, pullNum int, comment string) error {
+func (b *Client) CreateComment(repo models.Repo, pullNum int, comment string, command string) error {
 	// NOTE: I tried to find the maximum size of a comment for bitbucket.org but
 	// I got up to 200k chars without issue so for now I'm not going to bother
 	// to detect this.
@@ -249,7 +249,19 @@ func (g *Client) GetTeamNamesForUser(repo models.Repo, user models.User) ([]stri
 	return nil, nil
 }
 
+<<<<<<< HEAD
 // GetUserType get the user Type to verify is this is a Org user or a regular user
 func (g *Client) GetUserType(repo models.Repo, user models.User) (string, error) {
 	return "", nil
+=======
+func (b *Client) SupportsSingleFileDownload(models.Repo) bool {
+	return false
+}
+
+// DownloadRepoConfigFile return `atlantis.yaml` content from VCS (which support fetch a single file from repository)
+// The first return value indicate that repo contain atlantis.yaml or not
+// if BaseRepo had one repo config file, its content will placed on the second return value
+func (b *Client) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
+	return false, []byte{}, fmt.Errorf("Not Implemented")
+>>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

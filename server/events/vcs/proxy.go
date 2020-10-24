@@ -56,8 +56,8 @@ func (d *ClientProxy) GetModifiedFiles(repo models.Repo, pull models.PullRequest
 	return d.clients[repo.VCSHost.Type].GetModifiedFiles(repo, pull)
 }
 
-func (d *ClientProxy) CreateComment(repo models.Repo, pullNum int, comment string) error {
-	return d.clients[repo.VCSHost.Type].CreateComment(repo, pullNum, comment)
+func (d *ClientProxy) CreateComment(repo models.Repo, pullNum int, comment string, command string) error {
+	return d.clients[repo.VCSHost.Type].CreateComment(repo, pullNum, comment, command)
 }
 
 func (d *ClientProxy) HidePrevPlanComments(repo models.Repo, pullNum int) error {
@@ -88,6 +88,15 @@ func (d *ClientProxy) GetTeamNamesForUser(repo models.Repo, user models.User) ([
 	return d.clients[repo.VCSHost.Type].GetTeamNamesForUser(repo, user)
 }
 
+<<<<<<< HEAD
 func (d *ClientProxy) GetUserType(repo models.Repo, user models.User) (string, error) {
 	return d.clients[repo.VCSHost.Type].GetUserType(repo, user)
+=======
+func (d *ClientProxy) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
+	return d.clients[pull.BaseRepo.VCSHost.Type].DownloadRepoConfigFile(pull)
+}
+
+func (d *ClientProxy) SupportsSingleFileDownload(repo models.Repo) bool {
+	return d.clients[repo.VCSHost.Type].SupportsSingleFileDownload(repo)
+>>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

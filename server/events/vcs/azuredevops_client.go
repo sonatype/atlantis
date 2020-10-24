@@ -89,7 +89,7 @@ func (g *AzureDevopsClient) GetModifiedFiles(repo models.Repo, pull models.PullR
 //
 // If comment length is greater than the max comment length we split into
 // multiple comments.
-func (g *AzureDevopsClient) CreateComment(repo models.Repo, pullNum int, comment string) error {
+func (g *AzureDevopsClient) CreateComment(repo models.Repo, pullNum int, comment string, command string) error {
 	sepEnd := "\n```\n</details>" +
 		"\n<br>\n\n**Warning**: Output length greater than max comment size. Continued in next comment."
 	sepStart := "Continued from previous comment.\n<details><summary>Show Output</summary>\n\n" +
@@ -370,7 +370,16 @@ func (g *AzureDevopsClient) GetTeamNamesForUser(repo models.Repo, user models.Us
 	return nil, nil
 }
 
+<<<<<<< HEAD
 // GetUserType get the user Type to verify is this is a Org user or a regular user
 func (g *AzureDevopsClient) GetUserType(repo models.Repo, user models.User) (string, error) {
 	return "", nil
+=======
+func (g *AzureDevopsClient) SupportsSingleFileDownload(repo models.Repo) bool {
+	return false
+}
+
+func (g *AzureDevopsClient) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
+	return false, []byte{}, fmt.Errorf("Not Implemented")
+>>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }
