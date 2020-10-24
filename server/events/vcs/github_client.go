@@ -362,3 +362,14 @@ func (g *GithubClient) GetTeamNamesForUser(repo models.Repo, user models.User) (
 	}
 	return teamNames, nil
 }
+
+// GetUserType get the user Type to verify is this is a Org user or a regular user
+// https://docs.github.com/en/free-pro-team@latest/rest/reference/users#get-a-user
+func (g *GithubClient) GetUserType(repo models.Repo, user models.User) (string, error) {
+	checkUserType, _, err := g.client.Users.Get(g.ctx, user.Username)
+	if err != nil {
+		return "", err
+	}
+	userType := *checkUserType.Type
+	return userType, nil
+}

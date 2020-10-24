@@ -56,3 +56,6 @@ func (a *NotConfiguredVCSClient) err() error {
 func (a *NotConfiguredVCSClient) GetTeamNamesForUser(repo models.Repo, user models.User) ([]string, error) {
 	return nil, a.err()
 }
+func (g *NotConfiguredVCSClient) GetUserType(repo models.Repo, user models.User) (string, error) {
+	return "", nil
+}

@@ -19,18 +19,28 @@ import (
 // AtlantisYAMLFilename is the name of the config file for each repo.
 var AtlantisYAMLFilename string
 
-// Simplest hack to allow overriding "atlantis.yaml" to another name
-func init() {
-	AtlantisYAMLFilename = os.Getenv("ATLANTIS_YAML_FILENAME")
-	if AtlantisYAMLFilename == "" {
-		AtlantisYAMLFilename = "atlantis.yaml"
-	}
-}
+//const AtlantisYAMLFilename = "atlantis.yaml"
 
+// // Simplest hack to allow overriding "atlantis.yaml" to another name
+// func init() {
+// 	// 	AtlantisYAMLFilename = os.Getenv("ATLANTIS_YAML_FILENAME")
+// 	// 	if AtlantisYAMLFilename == "" {
+// 	// 		AtlantisYAMLFilename = "atlantis.yaml"
+// 	pepe := &ParserValidator{}
+// 	AtlantisYAMLFilename := pepe.AtlantisYAMLFilename
+// 	// 	}
+// }
 
 // ParserValidator parses and validates server-side repo config files and
 // repo-level atlantis.yaml files.
-type ParserValidator struct{}
+type ParserValidator struct {
+	AtlantisYAMLFilename string
+}
+
+// SetRepoCfg Set the atlantis yaml filename
+func (p *ParserValidator) SetRepoCfg(atlantisYamlFile string) {
+	AtlantisYAMLFilename = p.AtlantisYAMLFilename
+}
 
 // HasRepoCfg returns true if there is a repo config (atlantis.yaml) file
 // for the repo at absRepoDir.

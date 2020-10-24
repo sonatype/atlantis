@@ -83,6 +83,8 @@ const (
 	TFEHostnameFlag            = "tfe-hostname"
 	TFETokenFlag               = "tfe-token"
 	WriteGitCredsFlag          = "write-git-creds"
+	MultiServerFlag            = "multi-server"
+	AtlantisYamlFile           = "atlantis-yaml-file"
 
 	// NOTE: Must manually set these as defaults in the setDefaults function.
 	DefaultADBasicUser      = ""
@@ -98,6 +100,7 @@ const (
 	DefaultTFDownloadURL    = "https://releases.hashicorp.com"
 	DefaultTFEHostname      = "app.terraform.io"
 	DefaultVCSStatusName    = "atlantis"
+	DefaultAtlantisYamlFile = "atlantis.yaml"
 )
 
 var stringFlags = map[string]stringFlag{
@@ -246,6 +249,10 @@ var stringFlags = map[string]stringFlag{
 		description:  "Name used to identify Atlantis for pull request statuses.",
 		defaultValue: DefaultVCSStatusName,
 	},
+	AtlantisYamlFile: {
+		description:  "Custom yaml file name for repo level config",
+		defaultValue: DefaultAtlantisYamlFile,
+	},
 }
 
 var boolFlags = map[string]boolFlag{
@@ -306,6 +313,10 @@ var boolFlags = map[string]boolFlag{
 	WriteGitCredsFlag: {
 		description: "Write out a .git-credentials file with the provider user and token to allow cloning private modules over HTTPS or SSH." +
 			" This writes secrets to disk and should only be enabled in a secure environment.",
+		defaultValue: false,
+	},
+	MultiServerFlag: {
+		description:  "When multiple atlantis atlantis servers are used in the same repo",
 		defaultValue: false,
 	},
 }
@@ -522,6 +533,10 @@ func (s *ServerCmd) setDefaults(c *server.UserConfig) {
 	if c.TFEHostname == "" {
 		c.TFEHostname = DefaultTFEHostname
 	}
+	if c.AtlantisYamlFile == "" {
+		c.AtlantisYamlFile = DefaultAtlantisYamlFile
+	}
+
 }
 
 func (s *ServerCmd) validate(userConfig server.UserConfig) error {
@@ -537,6 +552,10 @@ func (s *ServerCmd) validate(userConfig server.UserConfig) error {
 
 	if (userConfig.SSLKeyFile == "") != (userConfig.SSLCertFile == "") {
 		return fmt.Errorf("--%s and --%s are both required for ssl", SSLKeyFileFlag, SSLCertFileFlag)
+	}
+
+	if (userConfig.AtlantisYamlFile == "atlantis.yaml") != (userConfig.MultiServerFlag == false) {
+		return fmt.Errorf("--%s and --%s are both required for multiserver", AtlantisYamlFile, MultiServerFlag)
 	}
 
 	// The following combinations are valid.

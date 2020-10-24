@@ -268,3 +268,8 @@ func MustConstraint(constraint string) version.Constraints {
 func (g *GitlabClient) GetTeamNamesForUser(repo models.Repo, user models.User) ([]string, error) {
 	return nil, nil
 }
+
+// GetUserType get the user Type to verify is this is a Org user or a regular user
+func (g *GitlabClient) GetUserType(repo models.Repo, user models.User) (string, error) {
+	return "", nil
+}

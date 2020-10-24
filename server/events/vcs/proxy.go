@@ -87,3 +87,7 @@ func (d *ClientProxy) MarkdownPullLink(pull models.PullRequest) (string, error) 
 func (d *ClientProxy) GetTeamNamesForUser(repo models.Repo, user models.User) ([]string, error) {
 	return d.clients[repo.VCSHost.Type].GetTeamNamesForUser(repo, user)
 }
+
+func (d *ClientProxy) GetUserType(repo models.Repo, user models.User) (string, error) {
+	return d.clients[repo.VCSHost.Type].GetUserType(repo, user)
+}

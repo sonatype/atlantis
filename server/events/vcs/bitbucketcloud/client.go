@@ -248,3 +248,8 @@ func (b *Client) makeRequest(method string, path string, reqBody io.Reader) ([]b
 func (g *Client) GetTeamNamesForUser(repo models.Repo, user models.User) ([]string, error) {
 	return nil, nil
 }
+
+// GetUserType get the user Type to verify is this is a Org user or a regular user
+func (g *Client) GetUserType(repo models.Repo, user models.User) (string, error) {
+	return "", nil
+}

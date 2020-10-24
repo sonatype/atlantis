@@ -84,6 +84,8 @@ type EventsController struct {
 	// Azure DevOps Team Project. If empty, no request validation is done.
 	AzureDevopsWebhookBasicPassword []byte
 	AzureDevopsRequestValidator     AzureDevopsRequestValidator
+	MultiServer                     bool
+	
 }
 
 // Post handles POST webhook requests.
@@ -403,6 +405,7 @@ func (e *EventsController) HandleGitlabCommentEvent(w http.ResponseWriter, event
 	e.handleCommentEvent(w, baseRepo, &headRepo, nil, user, event.MergeRequest.IID, event.ObjectAttributes.Note, models.Gitlab)
 }
 
+// AQUI
 func (e *EventsController) handleCommentEvent(w http.ResponseWriter, baseRepo models.Repo, maybeHeadRepo *models.Repo, maybePull *models.PullRequest, user models.User, pullNum int, comment string, vcsHost models.VCSHostType) {
 	parseResult := e.CommentParser.Parse(comment, vcsHost)
 	if parseResult.Ignore {
@@ -578,13 +581,19 @@ func (e *EventsController) commentUserDoesNotHavePermissions(baseRepo models.Rep
 // checkUserPermissions checks if the user has permissions to execute the command
 func (e *EventsController) checkUserPermissions(repo models.Repo, user models.User, cmd *events.CommentCommand) (bool, error) {
 	if cmd.Name == models.ApplyCommand || cmd.Name == models.PlanCommand {
-		teams, err := e.VCSClient.GetTeamNamesForUser(repo, user)
+		userType, err := e.VCSClient.GetUserType(repo, user)
 		if err != nil {
 			return false, err
 		}
-		ok := e.TeamWhitelistChecker.IsCommandAllowedForAnyTeam(teams, cmd.Name.String())
-		if !ok {
-			return false, nil
+		if userType != "User" {
+			teams, err := e.VCSClient.GetTeamNamesForUser(repo, user)
+			if err != nil {
+				return false, err
+			}
+			ok := e.TeamWhitelistChecker.IsCommandAllowedForAnyTeam(teams, cmd.Name.String())
+			if !ok {
+				return false, nil
+			}
 		}
 	}
 	return true, nil

@@ -39,4 +39,5 @@ type Client interface {
 	MergePull(pull models.PullRequest) error
 	MarkdownPullLink(pull models.PullRequest) (string, error)
 	GetTeamNamesForUser(repo models.Repo, user models.User) ([]string, error)
+	GetUserType(repo models.Repo, user models.User) (string, error)
 }

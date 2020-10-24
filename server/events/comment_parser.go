@@ -103,6 +103,7 @@ func (e *CommentParser) Parse(comment string, vcsHost models.VCSHostType) Commen
 	if multiLineRegex.MatchString(comment) {
 		return CommentParseResult{Ignore: true}
 	}
+	
 
 	// We first use strings.Fields to parse and do an initial evaluation.
 	// Later we use a proper shell parser and re-parse.
