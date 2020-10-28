@@ -39,14 +39,10 @@ type Client interface {
 	MergePull(pull models.PullRequest) error
 	MarkdownPullLink(pull models.PullRequest) (string, error)
 	GetTeamNamesForUser(repo models.Repo, user models.User) ([]string, error)
-<<<<<<< HEAD
-	GetUserType(repo models.Repo, user models.User) (string, error)
-=======
 
 	// DownloadRepoConfigFile return `atlantis.yaml` content from VCS (which support fetch a single file from repository)
 	// The first return value indicate that repo contain atlantis.yaml or not
 	// if BaseRepo had one repo config file, its content will placed on the second return value
 	DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error)
 	SupportsSingleFileDownload(repo models.Repo) bool
->>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

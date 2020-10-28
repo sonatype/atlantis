@@ -278,11 +278,6 @@ func (g *GitlabClient) GetTeamNamesForUser(repo models.Repo, user models.User) (
 	return nil, nil
 }
 
-<<<<<<< HEAD
-// GetUserType get the user Type to verify is this is a Org user or a regular user
-func (g *GitlabClient) GetUserType(repo models.Repo, user models.User) (string, error) {
-	return "", nil
-=======
 // DownloadRepoConfigFile return `atlantis.yaml` content from VCS (which support fetch a single file from repository)
 // The first return value indicate that repo contain atlantis.yaml or not
 // if BaseRepo had one repo config file, its content will placed on the second return value
@@ -303,5 +298,4 @@ func (g *GitlabClient) DownloadRepoConfigFile(pull models.PullRequest) (bool, []
 
 func (g *GitlabClient) SupportsSingleFileDownload(repo models.Repo) bool {
 	return true
->>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

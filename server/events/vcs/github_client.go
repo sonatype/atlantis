@@ -400,17 +400,6 @@ func (g *GithubClient) GetTeamNamesForUser(repo models.Repo, user models.User) (
 	return teamNames, nil
 }
 
-<<<<<<< HEAD
-// GetUserType get the user Type to verify is this is a Org user or a regular user
-// https://docs.github.com/en/free-pro-team@latest/rest/reference/users#get-a-user
-func (g *GithubClient) GetUserType(repo models.Repo, user models.User) (string, error) {
-	checkUserType, _, err := g.client.Users.Get(g.ctx, user.Username)
-	if err != nil {
-		return "", err
-	}
-	userType := *checkUserType.Type
-	return userType, nil
-=======
 // ExchangeCode returns a newly created app's info
 func (g *GithubClient) ExchangeCode(code string) (*GithubAppTemporarySecrets, error) {
 	ctx := context.Background()
@@ -450,5 +439,4 @@ func (g *GithubClient) DownloadRepoConfigFile(pull models.PullRequest) (bool, []
 
 func (g *GithubClient) SupportsSingleFileDownload(repo models.Repo) bool {
 	return true
->>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

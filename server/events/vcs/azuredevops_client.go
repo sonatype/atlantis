@@ -368,18 +368,12 @@ func (g *AzureDevopsClient) GetTeamNamesForUser(repo models.Repo, user models.Us
 	return nil, nil
 }
 
-<<<<<<< HEAD
-// GetUserType get the user Type to verify is this is a Org user or a regular user
-func (g *AzureDevopsClient) GetUserType(repo models.Repo, user models.User) (string, error) {
-	return "", nil
-=======
 func (g *AzureDevopsClient) SupportsSingleFileDownload(repo models.Repo) bool {
 	return false
 }
 
 func (g *AzureDevopsClient) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
 	return false, []byte{}, fmt.Errorf("Not Implemented")
->>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }
 
 // GitStatusContextFromSrc parses an Atlantis formatted src string into a context suitable

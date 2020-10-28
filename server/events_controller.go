@@ -87,8 +87,6 @@ type EventsController struct {
 	// Azure DevOps Team Project. If empty, no request validation is done.
 	AzureDevopsWebhookBasicPassword []byte
 	AzureDevopsRequestValidator     AzureDevopsRequestValidator
-	MultiServer                     bool
-	
 }
 
 // Post handles POST webhook requests.
@@ -408,7 +406,7 @@ func (e *EventsController) HandleGitlabCommentEvent(w http.ResponseWriter, event
 	e.handleCommentEvent(w, baseRepo, &headRepo, nil, user, event.MergeRequest.IID, event.ObjectAttributes.Note, models.Gitlab)
 }
 
-// AQUI
+// AQUI PEPE
 func (e *EventsController) handleCommentEvent(w http.ResponseWriter, baseRepo models.Repo, maybeHeadRepo *models.Repo, maybePull *models.PullRequest, user models.User, pullNum int, comment string, vcsHost models.VCSHostType) {
 	parseResult := e.CommentParser.Parse(comment, vcsHost)
 	if parseResult.Ignore {
@@ -444,19 +442,19 @@ func (e *EventsController) handleCommentEvent(w http.ResponseWriter, baseRepo mo
 
 	// Check if the user who commented has the permissions to execute the 'plan' or 'apply' commands
 	// if parseResult.Command != nil && user.Username != "" {
-	if !e.TestingMode {
-		ok, err := e.checkUserPermissions(baseRepo, user, parseResult.Command)
-		if err != nil {
-			e.Logger.Err("unable to comment on pull request: %s", err)
-			return
-		}
-		if !ok {
-			e.commentUserDoesNotHavePermissions(baseRepo, pullNum, user, parseResult.Command)
-			e.respond(w, logging.Warn, http.StatusForbidden, "User @%s does not have permissions to execute '%s' command", user.Username, parseResult.Command.Name.String())
-			return
-		}
-	}
+	// if !e.TestingMode {
+	// 	ok, err := e.checkUserPermissions(baseRepo, user, parseResult.Command)
+	// 	if err != nil {
+	// 		e.Logger.Err("unable to comment on pull request: %s", err)
+	// 		return
+	// 	}
+	// 	if !ok {
+	// 		e.commentUserDoesNotHavePermissions(baseRepo, pullNum, user, parseResult.Command)
+	// 		e.respond(w, logging.Warn, http.StatusForbidden, "User @%s does not have permissions to execute '%s' command", user.Username, parseResult.Command.Name.String())
+	// 		return
+	// 	}
 	// }
+	// // }
 
 	e.Logger.Debug("executing command")
 	fmt.Fprintln(w, "Processing...")
@@ -588,20 +586,20 @@ func (e *EventsController) commentUserDoesNotHavePermissions(baseRepo models.Rep
 // checkUserPermissions checks if the user has permissions to execute the command
 func (e *EventsController) checkUserPermissions(repo models.Repo, user models.User, cmd *events.CommentCommand) (bool, error) {
 	if cmd.Name == models.ApplyCommand || cmd.Name == models.PlanCommand {
-		userType, err := e.VCSClient.GetUserType(repo, user)
+		// userType, err := e.VCSClient.GetUserType(repo, user)
+		// if err != nil {
+		// 	return false, err
+		// }
+		// if userType != "User" {
+		teams, err := e.VCSClient.GetTeamNamesForUser(repo, user)
 		if err != nil {
 			return false, err
 		}
-		if userType != "User" {
-			teams, err := e.VCSClient.GetTeamNamesForUser(repo, user)
-			if err != nil {
-				return false, err
-			}
-			ok := e.TeamWhitelistChecker.IsCommandAllowedForAnyTeam(teams, cmd.Name.String())
-			if !ok {
-				return false, nil
-			}
+		ok := e.TeamWhitelistChecker.IsCommandAllowedForAnyTeam(teams, cmd.Name.String())
+		if !ok {
+			return false, nil
 		}
+		// }
 	}
 	return true, nil
 }

@@ -8,6 +8,7 @@ import version "github.com/hashicorp/go-version"
 type RepoCfg struct {
 	// Version is the version of the atlantis YAML file.
 	Version       int
+	ServerID      string
 	Projects      []Project
 	Workflows     map[string]Workflow
 	Automerge     bool

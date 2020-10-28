@@ -62,6 +62,7 @@ type DefaultProjectCommandBuilder struct {
 	PendingPlanFinder  *DefaultPendingPlanFinder
 	CommentBuilder     CommentBuilder
 	SkipCloneNoChanges bool
+	ServerID           string
 }
 
 // See ProjectCommandBuilder.BuildAutoplanCommands.
@@ -298,6 +299,11 @@ func (p *DefaultProjectCommandBuilder) buildProjectCommandCtx(
 
 	projCfgPtr, repoCfgPtr, err := p.getCfg(ctx, projectName, repoRelDir, workspace, repoDir)
 	if err != nil {
+		return models.ProjectCommandContext{}, err
+	}
+	// PEPE AQUI
+	if repoCfgPtr.ServerID != p.ServerID {
+		//err = fmt.Errorf("cannot specify a ServerID in %s that does not match the configured ServerID in the atlantis server", yaml.AtlantisYAMLFilename)
 		return models.ProjectCommandContext{}, err
 	}
 

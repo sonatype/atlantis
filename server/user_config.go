@@ -72,7 +72,7 @@ type UserConfig struct {
 	Webhooks               []WebhookConfig `mapstructure:"webhooks"`
 	WriteGitCreds          bool            `mapstructure:"write-git-creds"`
 	AtlantisYamlFile       string          `mapstructure:"atlantis-yaml-file"`
-	MultiServerFlag        bool            `mapstructure:"multi-server"`
+	ServerID               string          `mapstructure:"server-id"`
 }
 
 // ToLogLevel returns the LogLevel object corresponding to the user-passed

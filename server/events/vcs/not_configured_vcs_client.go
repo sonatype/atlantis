@@ -56,10 +56,6 @@ func (a *NotConfiguredVCSClient) err() error {
 func (a *NotConfiguredVCSClient) GetTeamNamesForUser(repo models.Repo, user models.User) ([]string, error) {
 	return nil, a.err()
 }
-<<<<<<< HEAD
-func (g *NotConfiguredVCSClient) GetUserType(repo models.Repo, user models.User) (string, error) {
-	return "", nil
-=======
 
 func (a *NotConfiguredVCSClient) SupportsSingleFileDownload(repo models.Repo) bool {
 	return false
@@ -67,5 +63,4 @@ func (a *NotConfiguredVCSClient) SupportsSingleFileDownload(repo models.Repo) bo
 
 func (a *NotConfiguredVCSClient) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
 	return true, []byte{}, a.err()
->>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

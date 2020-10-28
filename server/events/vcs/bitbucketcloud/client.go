@@ -249,11 +249,6 @@ func (g *Client) GetTeamNamesForUser(repo models.Repo, user models.User) ([]stri
 	return nil, nil
 }
 
-<<<<<<< HEAD
-// GetUserType get the user Type to verify is this is a Org user or a regular user
-func (g *Client) GetUserType(repo models.Repo, user models.User) (string, error) {
-	return "", nil
-=======
 func (b *Client) SupportsSingleFileDownload(models.Repo) bool {
 	return false
 }
@@ -263,5 +258,4 @@ func (b *Client) SupportsSingleFileDownload(models.Repo) bool {
 // if BaseRepo had one repo config file, its content will placed on the second return value
 func (b *Client) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
 	return false, []byte{}, fmt.Errorf("Not Implemented")
->>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

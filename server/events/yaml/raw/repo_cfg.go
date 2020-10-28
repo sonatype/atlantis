@@ -19,6 +19,7 @@ const DefaultParallelPlan = false
 // RepoCfg is the raw schema for repo-level atlantis.yaml config.
 type RepoCfg struct {
 	Version       *int                `yaml:"version,omitempty"`
+	ServerID      string              `yaml:"serverid,omitempty"`
 	Projects      []Project           `yaml:"projects,omitempty"`
 	Workflows     map[string]Workflow `yaml:"workflows,omitempty"`
 	Automerge     *bool               `yaml:"automerge,omitempty"`
@@ -72,6 +73,7 @@ func (r RepoCfg) ToValid() valid.RepoCfg {
 
 	return valid.RepoCfg{
 		Version:       *r.Version,
+		ServerID:      r.ServerID,
 		Projects:      validProjects,
 		Workflows:     validWorkflows,
 		Automerge:     automerge,

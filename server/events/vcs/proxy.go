@@ -88,15 +88,10 @@ func (d *ClientProxy) GetTeamNamesForUser(repo models.Repo, user models.User) ([
 	return d.clients[repo.VCSHost.Type].GetTeamNamesForUser(repo, user)
 }
 
-<<<<<<< HEAD
-func (d *ClientProxy) GetUserType(repo models.Repo, user models.User) (string, error) {
-	return d.clients[repo.VCSHost.Type].GetUserType(repo, user)
-=======
 func (d *ClientProxy) DownloadRepoConfigFile(pull models.PullRequest) (bool, []byte, error) {
 	return d.clients[pull.BaseRepo.VCSHost.Type].DownloadRepoConfigFile(pull)
 }
 
 func (d *ClientProxy) SupportsSingleFileDownload(repo models.Repo) bool {
 	return d.clients[repo.VCSHost.Type].SupportsSingleFileDownload(repo)
->>>>>>> 5ad687edf6ab942ad1036de076a5d6791de6074f
 }

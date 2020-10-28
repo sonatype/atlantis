@@ -36,6 +36,8 @@ const (
 	projectFlagShort   = "p"
 	verboseFlagLong    = "verbose"
 	verboseFlagShort   = ""
+	serveridFlagLong   = "serverid"
+	serveridFlagShort  = "s"
 	atlantisExecutable = "atlantis"
 )
 
@@ -45,6 +47,9 @@ const (
 // paste it again, GitHub adds two newlines and so we wanted to allow copying
 // and pasting GitHub comments.
 var multiLineRegex = regexp.MustCompile(`.*\r?\n[^\r\n]+`)
+
+// // The server ID string used to initialize the server when in multiserver setup
+// var AtlantisServerID string
 
 //go:generate pegomock generate -m --use-experimental-model-gen --package mocks -o mocks/mock_comment_parsing.go CommentParsing
 
@@ -69,6 +74,7 @@ type CommentParser struct {
 	GitlabUser      string
 	BitbucketUser   string
 	AzureDevopsUser string
+	ServerID        string
 }
 
 // CommentParseResult describes the result of parsing a comment as a command.
@@ -82,6 +88,11 @@ type CommentParseResult struct {
 	// Ignore is set to true when we should just ignore this comment.
 	Ignore bool
 }
+
+// SetServerID Set the serverid used to initialize the server
+// func (e *CommentParser) SetServerID(id string) {
+// 	AtlantisServerID = id
+// }
 
 // Parse parses the comment as an Atlantis command.
 //
@@ -103,7 +114,6 @@ func (e *CommentParser) Parse(comment string, vcsHost models.VCSHostType) Commen
 	if multiLineRegex.MatchString(comment) {
 		return CommentParseResult{Ignore: true}
 	}
-	
 
 	// We first use strings.Fields to parse and do an initial evaluation.
 	// Later we use a proper shell parser and re-parse.
@@ -166,6 +176,7 @@ func (e *CommentParser) Parse(comment string, vcsHost models.VCSHostType) Commen
 	var dir string
 	var project string
 	var verbose bool
+	var serverid string
 	var flagSet *pflag.FlagSet
 	var name models.CommandName
 
@@ -178,6 +189,7 @@ func (e *CommentParser) Parse(comment string, vcsHost models.VCSHostType) Commen
 		flagSet.StringVarP(&workspace, workspaceFlagLong, workspaceFlagShort, "", "Switch to this Terraform workspace before planning.")
 		flagSet.StringVarP(&dir, dirFlagLong, dirFlagShort, "", "Which directory to run plan in relative to root of repo, ex. 'child/dir'.")
 		flagSet.StringVarP(&project, projectFlagLong, projectFlagShort, "", fmt.Sprintf("Which project to run plan for. Refers to the name of the project configured in %s. Cannot be used at same time as workspace or dir flags.", yaml.AtlantisYAMLFilename))
+		flagSet.StringVarP(&serverid, serveridFlagLong, serveridFlagShort, "", "Which server id to send this to when using the multiserer option")
 		flagSet.BoolVarP(&verbose, verboseFlagLong, verboseFlagShort, false, "Append Atlantis log to comment.")
 	case models.ApplyCommand.String():
 		name = models.ApplyCommand
@@ -207,6 +219,13 @@ func (e *CommentParser) Parse(comment string, vcsHost models.VCSHostType) Commen
 			return CommentParseResult{CommentResponse: UnlockUsage}
 		}
 		return CommentParseResult{CommentResponse: e.errMarkdown(err.Error(), command, flagSet)}
+	}
+
+	// At this point we know is not unlock command and we are about to parse extra arguments but at this point we should check
+	// that serverid matches the serverid that was used to initialize the server and if does not matches then return ignore = true
+
+	if serverid != e.ServerID {
+		return CommentParseResult{Ignore: true}
 	}
 
 	var unusedArgs []string
