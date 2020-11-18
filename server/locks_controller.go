@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -27,6 +28,41 @@ type LocksController struct {
 	WorkingDirLocker   events.WorkingDirLocker
 	DB                 *db.BoltDB
 	DeleteLockCommand  events.DeleteLockCommand
+}
+
+// GetLocksResponse is returned to requests against GetLocks at /api/locks with the GET method. It contains a lock data object for each lock held by atlantis
+type GetLocksResponse struct {
+	Result []LockData
+}
+
+// LockData contains information about the lock, including the lock ID and which PR is holding the lock
+type LockData struct {
+	PullRequestURL string
+	LockID         string
+}
+
+// GetLocks response to requests against /api/locks with a marshaled GetLocksResponse object that contains information about all open locks
+func (l *LocksController) GetLocks(w http.ResponseWriter, _ *http.Request) {
+	var result []LockData
+	locks, err := l.Locker.List()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Fprintf(w, "Error listing locks: %s", err)
+		return
+	}
+	for key, lock := range locks {
+		result = append(result, LockData{PullRequestURL: lock.Pull.URL, LockID: key})
+	}
+	data, err := json.Marshal(GetLocksResponse{Result: result})
+	if err != nil {
+		l.respond(w, logging.Error, http.StatusInternalServerError, "Error creating list response: %s", err)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(data)
+	if err != nil {
+		l.respond(w, logging.Error, http.StatusInternalServerError, "Error writing list response: %s", err)
+	}
 }
 
 // GetLock is the GET /locks/{id} route. It renders the lock detail view.

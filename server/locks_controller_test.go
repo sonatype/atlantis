@@ -2,7 +2,9 @@ package server_test
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
+	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -28,6 +30,114 @@ import (
 func AnyRepo() models.Repo {
 	RegisterMatcher(NewAnyMatcher(reflect.TypeOf(models.Repo{})))
 	return models.Repo{}
+}
+
+func TestGetLocks_LockerErr(t *testing.T) {
+	t.Log("If there is an error retrieving the locks, make sure it is propagated")
+	RegisterMockTestingT(t)
+	l := mocks.NewMockLocker()
+	When(l.List()).ThenReturn(nil, errors.New("err"))
+	lc := server.LocksController{
+		Logger: logging.NewNoopLogger(),
+		Locker: l,
+	}
+	req, _ := http.NewRequest("GET", "/api/locks", bytes.NewBuffer(nil))
+	w := httptest.NewRecorder()
+	lc.GetLocks(w, req)
+	responseContains(t, w, http.StatusInternalServerError, "Error listing locks")
+}
+
+func TestGetLocks_None(t *testing.T) {
+	t.Log("If are no locks, we should return an empty list")
+	RegisterMockTestingT(t)
+	l := mocks.NewMockLocker()
+	When(l.List()).ThenReturn(make(map[string]models.ProjectLock), nil)
+	lc := server.LocksController{
+		Logger: logging.NewNoopLogger(),
+		Locker: l,
+	}
+	req, _ := http.NewRequest("GET", "/api/locks", bytes.NewBuffer(nil))
+	w := httptest.NewRecorder()
+	lc.GetLocks(w, req)
+	Assert(t, w.Code == 200, "expected successful status code from GetLocks but got %s", w.Code)
+	body, err := ioutil.ReadAll(w.Result().Body)
+	Ok(t, err)
+	var response server.GetLocksResponse
+	err = json.Unmarshal(body, &response)
+	Ok(t, err)
+	Assert(t, len(response.Result) == 0, "did not expect any locks to be returned")
+}
+
+func TestGetLocks_Success(t *testing.T) {
+	t.Log("Should be able to return list of PRs to locks held by PR")
+	RegisterMockTestingT(t)
+	l := mocks.NewMockLocker()
+	listResponse := make(map[string]models.ProjectLock)
+	listResponse["test"] = models.ProjectLock{
+		Pull: models.PullRequest{URL: "url", Author: "lkysow"},
+	}
+	When(l.List()).ThenReturn(listResponse, nil)
+	lc := server.LocksController{
+		Logger: logging.NewNoopLogger(),
+		Locker: l,
+	}
+	req, _ := http.NewRequest("GET", "/api/locks", bytes.NewBuffer(nil))
+	w := httptest.NewRecorder()
+	lc.GetLocks(w, req)
+	Assert(t, w.Code == 200, "expected successful status code from GetLocks but got %s", w.Code)
+	body, err := ioutil.ReadAll(w.Result().Body)
+	Ok(t, err)
+	var response server.GetLocksResponse
+	err = json.Unmarshal(body, &response)
+	Ok(t, err)
+	Assert(t, len(response.Result) == 1, "expected single Result list GetLocks, was instead length %i", len(response.Result))
+	testMap := response.Result[0]
+	expectedVal := "url"
+	Assert(t, testMap.PullRequestURL == expectedVal, "expected lock map ID to equal %s, was %s", expectedVal, testMap.PullRequestURL)
+	Assert(t, testMap.LockID == "test", "expected lock map ID to equal %s, was %s", "test", testMap.LockID)
+}
+
+func TestGetLocks_MultipleSuccess(t *testing.T) {
+	t.Log("Should be able to list multiple locks")
+	RegisterMockTestingT(t)
+	l := mocks.NewMockLocker()
+	listResponse := make(map[string]models.ProjectLock)
+	listResponse["test"] = models.ProjectLock{
+		Pull: models.PullRequest{URL: "url", Author: "lkysow"},
+	}
+	listResponse["testTwo"] = models.ProjectLock{
+		Pull: models.PullRequest{URL: "url", Author: "lkysow"},
+	}
+	listResponse["testThree"] = models.ProjectLock{
+		Pull: models.PullRequest{URL: "urlTwo", Author: "lkysow"},
+	}
+	When(l.List()).ThenReturn(listResponse, nil)
+	lc := server.LocksController{
+		Logger: logging.NewNoopLogger(),
+		Locker: l,
+	}
+	req, _ := http.NewRequest("GET", "/api/locks", bytes.NewBuffer(nil))
+	w := httptest.NewRecorder()
+	lc.GetLocks(w, req)
+	Assert(t, w.Code == 200, "expected successful status code from GetLocks but got %s", w.Code)
+	body, err := ioutil.ReadAll(w.Result().Body)
+	Ok(t, err)
+	var response server.GetLocksResponse
+	err = json.Unmarshal(body, &response)
+	Ok(t, err)
+	Assert(t, len(response.Result) == 3, "expected map with three entries from GetLocks, was instead length %i", len(response.Result))
+	for _, lockMap := range response.Result {
+		if lockMap.PullRequestURL == "url" {
+			if lockMap.LockID != "testTwo" && lockMap.LockID != "test" {
+				Assert(t, false, "unexpected lock ID - found lock with url %s and ID %s", lockMap.PullRequestURL, lockMap.LockID)
+			}
+		} else if lockMap.PullRequestURL == "urlTwo" {
+			expectedLockID := "testThree"
+			Assert(t, lockMap.LockID == expectedLockID, "expected PR at %s to have lock ID %s but found %s instead", lockMap.PullRequestURL, lockMap.LockID, expectedLockID)
+		} else {
+			Assert(t, false, "Found PR with unexpected URL - %s", lockMap.PullRequestURL)
+		}
+	}
 }
 
 func TestGetLockRoute_NoLockID(t *testing.T) {
