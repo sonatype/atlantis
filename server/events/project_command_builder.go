@@ -301,11 +301,11 @@ func (p *DefaultProjectCommandBuilder) buildProjectCommandCtx(
 	if err != nil {
 		return models.ProjectCommandContext{}, err
 	}
-	// PEPE AQUI
-	if repoCfgPtr.ServerID != p.ServerID {
-		//err = fmt.Errorf("cannot specify a ServerID in %s that does not match the configured ServerID in the atlantis server", yaml.AtlantisYAMLFilename)
-		return models.ProjectCommandContext{}, err
-	}
+	// // PEPE AQUI
+	// if repoCfgPtr.ServerID != p.ServerID {
+	// 	//err = fmt.Errorf("cannot specify a ServerID in %s that does not match the configured ServerID in the atlantis server", yaml.AtlantisYAMLFilename)
+	// 	return models.ProjectCommandContext{}, err
+	// }
 
 	var projCfg valid.MergedProjectCfg
 	if projCfgPtr != nil {

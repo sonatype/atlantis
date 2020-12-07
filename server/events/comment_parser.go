@@ -87,6 +87,8 @@ type CommentParseResult struct {
 	CommentResponse string
 	// Ignore is set to true when we should just ignore this comment.
 	Ignore bool
+	// MultiServer is true when a ServerID is set
+	MultiServer bool
 }
 
 // SetServerID Set the serverid used to initialize the server
@@ -221,11 +223,13 @@ func (e *CommentParser) Parse(comment string, vcsHost models.VCSHostType) Commen
 		return CommentParseResult{CommentResponse: e.errMarkdown(err.Error(), command, flagSet)}
 	}
 
-	// At this point we know is not unlock command and we are about to parse extra arguments but at this point we should check
-	// that serverid matches the serverid that was used to initialize the server and if does not matches then return ignore = true
-
-	if serverid != e.ServerID {
+	// At this point we know is not unlock command and we are about to parse extra arguments but here we should check
+	// that serverid matches the serverid that was used to initialize the server and if does not matches then return ignore = True
+	if serverid != "" && serverid != e.ServerID {
 		return CommentParseResult{Ignore: true}
+	}
+	if serverid == "" && e.ServerID != "" {
+		return CommentParseResult{CommentResponse: e.errMarkdown(fmt.Sprintf("Atlantis is configured with MultiServer and no ServerID has been provided: "), command, flagSet)}
 	}
 
 	var unusedArgs []string
